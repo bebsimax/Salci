@@ -1,0 +1,3 @@
+
+def isfloat(argument):
+    
