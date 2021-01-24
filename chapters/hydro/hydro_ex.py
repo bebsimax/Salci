@@ -35,12 +35,3 @@ plt.plot(x,y)
 
 plt.savefig(main_folder, dpi=200)
 
-
-
-@exercise_decorator
-def symbol_by_name_ex():
-    text='dupsko'
-    solution = None
-    answer = 'pikczer'
-    image = None
-    return (text, solution, answer, image)
