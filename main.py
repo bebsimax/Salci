@@ -268,7 +268,7 @@ class MainApplication(tk.Frame):
 
 
 
-
+#main
 if __name__ == "__main__":
     global root
     root = tk.Tk()
