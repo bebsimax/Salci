@@ -1,18 +1,7 @@
-
+from main import PackedExercise, ExerciseList
 import random
+import matplotlib.pyplot as plt
 
-class ExerciseList:
-    def __init__(self):
-        self.exercises = []
-    def __call__(self, exercise):
-        self.exercises.append(exercise)
-    def __iter__(self):
-        for func in self.exercises:
-            yield func
-    def __getitem__(self, index):
-        return self.exercises[index]
-    def __len__(self):
-        return len(self.exercises)
 exercise_decorator = ExerciseList()
 
 
@@ -59,65 +48,57 @@ for line in open(constants):
 
 
 
-
-
-
-
 @exercise_decorator
 def symbol_by_name_ex():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the symbol of constant named {} ?'.format(constant.name)
-    solution = None
-    image = None
-    answer = constant.symbol
-    return (text, solution, answer, image)
+
+    y = [random.randint(0,10) for a in range(10)]
+    x = [a for a in range(len(y))]
+    plt.plot(x, y)
+    plt.grid()
+    figure = plt.gcf()
+    figure.set_size_inches(5.8, 4)
+    image = figure
+    answer = constant.value
+    return PackedExercise(text=text, answer=answer, image=image, solution="au")
 
 @exercise_decorator
 def symbol_by_value_ex():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the symbol of constant with value {:.2e} ?'.format(constant.value)
-    solution = None
-    image = None
     answer = constant.symbol
-    return (text, solution, answer, image)
+    return PackedExercise(text=text, answer=answer)
 
 @exercise_decorator
 def name_by_symbol():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the name of constant with symbol {} ?'.format(constant.symbol)
-    solution = None
-    image = None
     answer = constant.name
-    return (text, solution, answer, image)
+    return PackedExercise(text=text, answer=answer)
 
 
 @exercise_decorator
 def name_by_value():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the name of constant with value {:.2e} ?'.format(constant.value)
-    solution = None
-    image = None
     answer = constant.name
-    return (text, solution, answer, image)
+    return PackedExercise(text=text, answer=answer)
 
 @exercise_decorator
 def value_by_name():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the value of constant named {} ?'.format(constant.name)
-    solution = None
-    image = None
     answer = constant.value
-    return (text, solution, answer, image)
+    return PackedExercise(text=text, answer=answer)
 
 
 @exercise_decorator
 def value_by_symbol():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the value of constant with symbol {} ?'.format(constant.symbol)
-    solution = None
-    image = None
     answer = constant.value
-    return (text, solution, answer, image)
+    return PackedExercise(text=text, answer=answer)
 
 
 
