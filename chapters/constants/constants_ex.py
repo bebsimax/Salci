@@ -60,7 +60,7 @@ def symbol_by_name_ex():
     figure = plt.gcf()
     figure.set_size_inches(5.8, 4)
     image = figure
-    answer = constant.value
+    answer = constant.symbol
     return PackedExercise(text=text, answer=answer, image=image, solution="au")
 
 @exercise_decorator

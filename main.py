@@ -263,7 +263,11 @@ The hits are:
         if self.answer is None:
             return
         self.Text_Answer.delete('1.0', tk.END)
-        self.Text_Answer.insert(tk.END, str(self.answer))
+        if isinstance(self.answer, float):
+            self.Text_Answer.insert(tk.END, "{:.2e}".format(self.answer))
+        else:
+            self.Text_Answer.insert(tk.END, self.answer)
+
 
     def check_submit(self):
         submit = self.Entry.get()
@@ -356,7 +360,7 @@ if __name__ == "__main__":
     root = tk.Tk()
     global root_h
     global root_w
-    root_h, root_w = (800, 1200)
+    root_h, root_w = (800, 1350)
     root.geometry('{}x{}'.format(root_w, root_h))
     root.title('Salci')
 
