@@ -1,4 +1,5 @@
-from main import PackedExercise, ExerciseList
+from PackedExercise import PackedExercise
+from ExerciseList import ExerciseList
 import random
 import matplotlib.pyplot as plt
 
@@ -8,22 +9,27 @@ exercise_decorator = ExerciseList()
 import os
 this_folder = os.path.dirname(os.path.abspath(__file__))
 
+
 class Constant():
     def __init__(self, name, symbol, value):
         self.name = name
         self.symbol = symbol
         self.value = value
+
     def __repr__(self):
         return '''
     Constant: {}
     Symbol: {}
     Value: {:.2e}'''.format(self.name, self.symbol, self.value)
+
     def __mul__(self, other):
         return self.value*other
+
     def __rmul__(self, other):
         return self.value*other
 
-class Constant_Dir():
+
+class ConstantDir:
     def __init__(self):
         self.registry = {}
 
@@ -31,7 +37,7 @@ class Constant_Dir():
         self.registry.update({'{}'.format(constant.name):constant})
 
 
-constant_d = Constant_Dir()
+constant_d = ConstantDir()
 
 
 constants = os.path.join(this_folder, 'constants.txt')
@@ -41,11 +47,6 @@ for line in open(constants):
     name, symbol, value = (line[0], line[1], float(line[2]))
     this_constant = Constant(name, symbol, value)
     constant_d(this_constant)
-
-
-
-
-
 
 
 @exercise_decorator
@@ -63,12 +64,14 @@ def symbol_by_name_ex():
     answer = constant.symbol
     return PackedExercise(text=text, answer=answer, image=image, solution="au")
 
+
 @exercise_decorator
 def symbol_by_value_ex():
     constant = random.choice(list(constant_d.registry.values()))
     text = 'What is the symbol of constant with value {:.2e} ?'.format(constant.value)
     answer = constant.symbol
     return PackedExercise(text=text, answer=answer)
+
 
 @exercise_decorator
 def name_by_symbol():
@@ -84,6 +87,7 @@ def name_by_value():
     text = 'What is the name of constant with value {:.2e} ?'.format(constant.value)
     answer = constant.name
     return PackedExercise(text=text, answer=answer)
+
 
 @exercise_decorator
 def value_by_name():

@@ -1,5 +1,5 @@
-
-from main import ExerciseList, PackedExercise
+from PackedExercise import PackedExercise
+from ExerciseList import ExerciseList
 import matplotlib.pyplot as plt
 import random
 exercise_decorator = ExerciseList()
@@ -22,6 +22,7 @@ rho - water density [kg/m3]
 h - depth [m]
 g - earth's acceleration [m/s^2]"""
     return PackedExercise(text=text, answer=answer, solution=solution)
+
 
 @exercise_decorator
 def mass_given_specific_weight():

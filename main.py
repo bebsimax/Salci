@@ -1,4 +1,3 @@
-
 import sys
 import os
 import tkinter as tk
@@ -6,37 +5,15 @@ import random
 import matplotlib.pyplot as plt
 from importlib import import_module
 from PIL import ImageTk, Image
+from common import ExerciseList, PackedExercise
 
 main_folder = os.path.dirname(os.path.abspath(__file__))
 chapters = os.path.join(main_folder, "chapters")
 if chapters not in sys.path:
     sys.path.append(chapters)
-
-
-class ExerciseList:
-    def __init__(self):
-        self.exercises = []
-
-    def __call__(self, exercise):
-        self.exercises.append(exercise)
-
-    def __iter__(self):
-        for func in self.exercises:
-            yield func
-
-    def __getitem__(self, index):
-        return self.exercises[index]
-
-    def __len__(self):
-        return len(self.exercises)
-
-
-class PackedExercise:
-    def __init__(self, text, answer, solution=None, image=None):
-        self.text = text
-        self.solution = solution
-        self.answer = answer
-        self.image = image
+common = os.path.join(main_folder, "common")
+if common not in sys.path:
+    sys.path.append(common)
 
 
 class Navigation(tk.Frame):
@@ -47,7 +24,7 @@ class Navigation(tk.Frame):
         self.Chapter_Listbox = tk.Listbox(self, bg="orange", selectmode="single", height=5, width=20)
         self.chapters = os.listdir(chapters)
         for index, chapter in enumerate(self.chapters, start=1):
-            self.Chapter_Listbox.insert(index, str(index) + "." + chapter)
+            self.Chapter_Listbox.insert(index, chapter)
         
         self.Chapter_Scrollbar = tk.Scrollbar(self)
         self.Chapter_Listbox.config(yscrollcommand=self.Chapter_Scrollbar.set)
@@ -84,9 +61,6 @@ class Navigation(tk.Frame):
             name = self.Chapter_Listbox.get(self.Chapter_Listbox.curselection())
         except:
             return
-        name = name.split(".")
-        ch_number = name[0]
-        name = name[1]
         module_name = name + "_ex"
         ch_path = os.path.join(chapters, name)
         if ch_path not in sys.path:
@@ -94,43 +68,51 @@ class Navigation(tk.Frame):
         ex_module = import_module(module_name)
         self.exercise_decorator = ex_module.exercise_decorator
         for number in range(len(ex_module.exercise_decorator)):
-            self.Ex_Listbox.insert(number+1, str(ch_number) + ". " + str(number+1))
+            self.Ex_Listbox.insert(number+1, str(number+1))
         self.Ex_Button.config(state=tk.NORMAL)
-    def load_ex(self):
-        try:
-            number = self.Ex_Listbox.get(self.Ex_Listbox.curselection())
-        except:
+
+    def load_ex(self, clear=False):
+
+        packed_exercise = self.get_function()
+        if packed_exercise is None:
             return
-        number = number.split(".")[1]
-        ex = self.exercise_decorator[int(number)-1]
-        
-        packed_exercise = ex()
-        
+        # unpack the contents
         self.parent.Entry.answer = packed_exercise.answer
         self.parent.Solution.solution = packed_exercise.solution
-
-        self.clear_text()
-        self.insert_text(packed_exercise.text)
-
+        # replace the text boxes
+        self.parent.Text.replace_text(packed_exercise.text)
         self.parent.Solution.insert_pre_sol(self.parent.Solution.solution)
-
+        # set the text and entry to initial state
+        if clear is True:
+            self.parent.Entry.set_initial()
+        # check for return matplotlib figure, paint the canvas
         if packed_exercise.image:
             self.parent.Plot.insert_image(packed_exercise.image)
         else:
             if not self.parent.Plot.is_blank:
                 self.parent.Plot.set_to_blank()
+        # enable the buttons
         self.parent.Entry.Button_Submit.config(state=tk.NORMAL)
         self.parent.Entry.Button_Show_Answer.config(state=tk.NORMAL)
+        self.parent.Entry.Button_Next.config(state=tk.NORMAL)
 
-    def clear_text(self):
-        self.parent.Text.Text.delete("1.0", tk.END)
+    def get_function(self):
+        try:
+            self.number = self.Ex_Listbox.get(self.Ex_Listbox.curselection())
+        except:
+            return
+        ex = self.exercise_decorator[int(self.number) - 1]
+        return ex()
 
-    def insert_text(self, text):
-        self.parent.Text.Text.insert(tk.END, text)
-
-
-
-
+    def load_next(self):
+        self.Ex_Listbox.selection_clear(0, tk.END)
+        try:
+            self.Ex_Listbox.selection_set(self.number)
+            self.load_ex(True)
+        except:
+            self.parent.Entry.Text.delete("1.0", tk.END)
+            self.parent.Entry.Text.insert(tk.END, "Out of exercises")
+            return
 
 
 class Text(tk.Frame):
@@ -154,6 +136,10 @@ class Text(tk.Frame):
         self.Text.pack(side=tk.LEFT, fill=tk.Y)
         self.Scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
+    def replace_text(self, text):
+        self.Text.delete("1.0", tk.END)
+        self.Text.insert(tk.END, text)
+
 
 class Plot(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
@@ -164,6 +150,7 @@ class Plot(tk.Frame):
         self.white = ImageTk.PhotoImage(white)
         self.Canvas = tk.Canvas(self, width=600, height=400)
         self.Canvas.pack(side=tk.LEFT, fill=tk.X)
+        # TODO generate white with matplotlib
         self.image_id = self.Canvas.create_image(0,
                                                  0,
                                                  anchor=tk.NW,
@@ -200,7 +187,6 @@ class Solution(tk.Frame):
         self.Text.pack(side=tk.LEFT, fill=tk.Y)
         self.Scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
 
-
     def insert_pre_sol(self, solution):
         if solution:
             self.Text.delete("1.0", tk.END)
@@ -224,14 +210,16 @@ class Entry(tk.Frame):
         self.Label = tk.Label(self, text="Type your answer here:")
         self.Entry = tk.Entry(self)
         self.answer = None
-        self.Text = tk.Text(self, bg="pink", height=8)
-        self.Text.insert(tk.END, """After you submit your answer
+        self.answer_initial_text = "Press \"Show Answer\" to reveal Answer"
+        self.Text_initial_text = """After you submit your answer
 this text will be replaced
 with hint about the answer.
 The hits are:
 1. "Exact match" - if +/- 0.5% from answer
 2. "Close" - if +/- 5% from answer
-3. "Way off" - in rest of the cases""")
+3. "Way off" - in rest of the cases"""
+        self.Text = tk.Text(self, bg="pink", height=8)
+        self.Text.insert(tk.END, self.Text_initial_text)
         self.text_responses = {"match"  : "Exact match",
                                "close"  : "Close",
                                "off"    : "Way off",
@@ -241,11 +229,11 @@ The hits are:
         self.close_eps = 0.05
 
         self.Text_Answer = tk.Text(self, bg="green", height=1)
-        self.Text_Answer.insert(tk.END, "Press \"Show Answer\" to reveal Answer")
+        self.Text_Answer.insert(tk.END, self.answer_initial_text)
         self.Button_Submit = tk.Button(self, text="Submit", width=10, state=tk.DISABLED, command=self.check_submit)
         self.Button_Show_Answer = tk.Button(self, text="Show Answer", command=self.show_answer, state=tk.DISABLED)
         self.Button_Show_Solution = tk.Button(self, text="Show Solution", state=tk.DISABLED, command=self.parent.Solution.insert_solution)
-        self.Button_Next = tk.Button(self, text="Next Exercise", state=tk.DISABLED)
+        self.Button_Next = tk.Button(self, text="Next Exercise", state=tk.DISABLED, command=self.parent.Navigation.load_next)
         self.Button_Random = tk.Button(self, text="Random Exercise", state=tk.DISABLED)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -267,7 +255,6 @@ The hits are:
             self.Text_Answer.insert(tk.END, "{:.2e}".format(self.answer))
         else:
             self.Text_Answer.insert(tk.END, self.answer)
-
 
     def check_submit(self):
         submit = self.Entry.get()
@@ -301,9 +288,12 @@ The hits are:
             else:
                 return self.text_responses["off"]
 
-
-
-
+    def set_initial(self):
+        self.Text.delete("1.0", tk.END)
+        self.Text.insert(tk.END, self.Text_initial_text)
+        self.Text_Answer.delete("1.0", tk.END)
+        self.Text_Answer.insert(tk.END, self.answer_initial_text)
+        self.Entry.delete(0, tk.END)
 
 
 class MainApplication(tk.Frame):
@@ -347,7 +337,7 @@ class MainApplication(tk.Frame):
         
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
-
+        # TODO: replace text and plot
         self.Navigation.grid(row=0, column=0, columnspan=2)
         self.Text.grid(row=1, rowspan=3, column=0)
         self.Solution.grid(row=4, rowspan=3, column=0)
