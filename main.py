@@ -95,24 +95,36 @@ class Navigation(tk.Frame):
         self.parent.Entry.Button_Submit.config(state=tk.NORMAL)
         self.parent.Entry.Button_Show_Answer.config(state=tk.NORMAL)
         self.parent.Entry.Button_Next.config(state=tk.NORMAL)
+        self.parent.Entry.Button_Prev.config(state=tk.NORMAL)
 
     def get_function(self):
         try:
             self.number = self.Ex_Listbox.get(self.Ex_Listbox.curselection())
         except:
             return
-        ex = self.exercise_decorator[int(self.number) - 1]
+        self.number = int(self.number)-1
+        ex = self.exercise_decorator[self.number]
         return ex()
 
-    def load_next(self):
+    def load_next(self, event=None):
         self.Ex_Listbox.selection_clear(0, tk.END)
         try:
-            self.Ex_Listbox.selection_set(self.number)
+            self.Ex_Listbox.selection_set(self.number+1)
             self.load_ex(True)
         except:
             self.parent.Entry.Text.delete("1.0", tk.END)
             self.parent.Entry.Text.insert(tk.END, "Out of exercises")
             return
+
+    def load_previous(self, event=None):
+        self.Ex_Listbox.selection_clear(0, tk.END)
+        #try:
+        self.Ex_Listbox.selection_set(int(self.number)-1)
+        self.load_ex(clear=True)
+        #except:
+           # self.parent.Entry.Text.delete("1.0", tk.END)
+          #  self.parent.Entry.Text.insert(tk.END, "Out of exercises")
+           # return
 
 
 class Text(tk.Frame):
@@ -122,7 +134,8 @@ class Text(tk.Frame):
 
         self.Text = tk.Text(self,
                             bg='pink',
-                            height=20, width=70)
+                            height=20, width=70,
+                            font=("Helvetica", 11))
         self.Text.insert(tk.END, """To load exercise:
 1. Select chapter from first list
 2. Press load chapter
@@ -178,7 +191,8 @@ class Solution(tk.Frame):
         self.Text = tk.Text(self,
                             bg="lightblue",
                             height=20,
-                            width=70)
+                            width=70,
+                            font=("Helvetica", 11))
 
         self.Scrollbar = tk.Scrollbar(self)
         self.Scrollbar.config(command=self.Text.yview)
@@ -218,22 +232,26 @@ The hits are:
 1. "Exact match" - if +/- 0.5% from answer
 2. "Close" - if +/- 5% from answer
 3. "Way off" - in rest of the cases"""
-        self.Text = tk.Text(self, bg="pink", height=8)
-        self.Text.insert(tk.END, self.Text_initial_text)
+        self.Text = tk.Text(self, bg="pink", height=8, font=("Helvetica", 10))
+        self.Text.tag_configure("center", justify="center")
+        self.Text.insert("1.0", self.Text_initial_text, "center")
         self.text_responses = {"match"  : "Exact match",
                                "close"  : "Close",
                                "off"    : "Way off",
                                "unknown": "Unknown input"}
-
+        # ranges for match and close hint
+        # 0.5% and 5%
         self.match_eps = 0.005
         self.close_eps = 0.05
 
-        self.Text_Answer = tk.Text(self, bg="green", height=1)
-        self.Text_Answer.insert(tk.END, self.answer_initial_text)
-        self.Button_Submit = tk.Button(self, text="Submit", width=10, state=tk.DISABLED, command=self.check_submit)
+        self.Text_Answer = tk.Text(self, bg="green", height=1, font=("Helvetica", 11), padx=-50)
+        self.Text_Answer.tag_configure("center", justify="center")
+        self.Text_Answer.insert("1.0", self.answer_initial_text, "center")
+        self.Button_Submit = tk.Button(self, text="Submit (\u23ce)", width=10, state=tk.DISABLED, command=self.check_submit)
         self.Button_Show_Answer = tk.Button(self, text="Show Answer", command=self.show_answer, state=tk.DISABLED)
         self.Button_Show_Solution = tk.Button(self, text="Show Solution", state=tk.DISABLED, command=self.parent.Solution.insert_solution)
-        self.Button_Next = tk.Button(self, text="Next Exercise", state=tk.DISABLED, command=self.parent.Navigation.load_next)
+        self.Button_Prev = tk.Button(self, text="Prev Exercise (<-)", state=tk.DISABLED, command=self.parent.Navigation.load_previous)
+        self.Button_Next = tk.Button(self, text="Next Exercise (->)", state=tk.DISABLED, command=self.parent.Navigation.load_next)
         self.Button_Random = tk.Button(self, text="Random Exercise", state=tk.DISABLED)
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
@@ -241,27 +259,28 @@ The hits are:
         self.Entry.grid(row=0, column=2)
         self.Button_Submit.grid(row=0, column=3)
         self.Text.grid(row=1, rowspan=3, column=0, columnspan=3)
-        self.Text_Answer.grid(row=4, column=0, columnspan=3)
+        self.Text_Answer.grid(row=4, rowspan=2, column=0, columnspan=3)
         self.Button_Next.grid(row=1, column=3)
-        self.Button_Random.grid(row=2, column=3)
-        self.Button_Show_Solution.grid(row=3, column=3)
-        self.Button_Show_Answer.grid(row=4, column=3)
+        self.Button_Prev.grid(row=2,column=3)
+        self.Button_Random.grid(row=3, column=3)
+        self.Button_Show_Solution.grid(row=4, column=3)
+        self.Button_Show_Answer.grid(row=5, column=3)
 
     def show_answer(self):
         if self.answer is None:
             return
         self.Text_Answer.delete('1.0', tk.END)
         if isinstance(self.answer, float):
-            self.Text_Answer.insert(tk.END, "{:.2e}".format(self.answer))
+            self.Text_Answer.insert("1.0", "{:.2e}".format(self.answer), "center")
         else:
-            self.Text_Answer.insert(tk.END, self.answer)
+            self.Text_Answer.insert("1.0", self.answer, "center")
 
-    def check_submit(self):
+    def check_submit(self, event=None):
         submit = self.Entry.get()
         if submit is "":
             return
         self.Text.delete("1.0", tk.END)
-        self.Text.insert(tk.END, self.is_submit_correct(submit, self.answer))
+        self.Text.insert("1.0", self.is_submit_correct(submit, self.answer), "center")
 
     def is_submit_correct(self, submit, answer):
         if isinstance(answer, str):
@@ -290,16 +309,15 @@ The hits are:
 
     def set_initial(self):
         self.Text.delete("1.0", tk.END)
-        self.Text.insert(tk.END, self.Text_initial_text)
+        self.Text.insert("1.0", self.Text_initial_text, "center")
         self.Text_Answer.delete("1.0", tk.END)
-        self.Text_Answer.insert(tk.END, self.answer_initial_text)
+        self.Text_Answer.insert("1.0", self.answer_initial_text, "center")
         self.Entry.delete(0, tk.END)
 
 
 class MainApplication(tk.Frame):
     def __init__(self, parent, *args, **kwargs):
         tk.Frame.__init__(self, parent, *args, **kwargs)
-
         self.Navigation_h = root_h * 0.1
         self.Navigation_w = root_w
         self.Text_h = root_h * 0.45
@@ -315,7 +333,8 @@ class MainApplication(tk.Frame):
                                      bg='grey',
                                      height=self.Navigation_h,
                                      width=self.Navigation_w)
-        
+        parent.bind("<Right>", self.Navigation.load_next)
+        parent.bind("<Left>", self.Navigation.load_previous)
         self.Text = Text(self,
                          bg='black',
                          height=self.Text_h,
@@ -334,6 +353,7 @@ class MainApplication(tk.Frame):
                            bg='blue',
                            height=self.Entry_h,
                            width=self.Entry_w)
+        parent.bind("<Return>", self.Entry.check_submit)
         
         self.grid_rowconfigure(0, weight=1)
         self.grid_columnconfigure(0, weight=1)
