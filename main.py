@@ -300,6 +300,13 @@ The hits are:
             upper_match_range = answer + answer * self.match_eps
             lower_close_range = answer - answer * self.close_eps
             upper_close_range = answer + answer * self.close_eps
+            if answer < 0:
+                temp = lower_match_range
+                lower_match_range = upper_match_range
+                upper_match_range = temp
+                temp = lower_close_range
+                lower_close_range = upper_close_range
+                upper_close_range = temp
             if lower_match_range < submit < upper_match_range:
                 return self.text_responses["match"]
             elif lower_close_range < submit < upper_close_range:
