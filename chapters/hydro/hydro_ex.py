@@ -48,6 +48,27 @@ m = {0}*V/g""".format(gamma_greek, rho_greek)
 
 
 @exercise_decorator
+def specific_weight_given_mass():
+    gamma_greek = greek_letters["Capital"]["Gamma"]
+    rho_greek = greek_letters["Small"]["Rho"]
+    m = random.randint(1, 100) * 5
+    V = random.randint(1, 3) / 10000
+    text = """{}kg of fluid is stored in tank with capacity V={:.2e}m^3.
+Calculate fluid's specific weight {}.""".format(m, V, gamma_greek)
+    answer = m/V*9.81
+    solution = """Specific weight {0} is weight per unit volume of a material.
+{0} = {1}*g
+{1} - material's density [kg/m^3]
+{1} = m/V
+Where:
+m - mass [kg]
+V - volume [m^3]
+So:
+{0} = m/V * g""".format(gamma_greek, rho_greek)
+    return PackedExercise(text=text, answer=answer, solution=solution)
+
+
+@exercise_decorator
 def volume_of_water_leaked_pipeline():
     xi=5e-10
     xi_greek = greek_letters["Small"]["Xi"]
@@ -76,4 +97,6 @@ Where:
 {1}p = p2-p1
 V1 = d^2/4 * {2} * L""".format(xi_greek, delta_greek, pi_greek)
     return PackedExercise(text=text, answer=answer, solution=solution)
+
+
 
