@@ -69,6 +69,24 @@ So:
 
 
 @exercise_decorator
+def gravity_given_specific_weight_and_density():
+    gamma_greek = greek_letters["Capital"]["Gamma"]
+    rho_greek = greek_letters["Small"]["Rho"]
+    gamma = random.randint(1, 10) * 1000
+    rho = random.randint(1, 10) * 1000
+    answer = gamma/rho
+    text = """Given fluid density {0} and specific weight {1}.
+{0} = {2} N/m^3
+{1} = {3} kg/m^3
+Calculate planet's acceleration a.""".format(rho_greek, gamma_greek, gamma, rho)
+    solution = """Specific weight {0} is weight per unit volume of a material.
+{0} = {1}*a
+So acceleration:
+a = {0}/{1}""".format(gamma_greek, rho_greek)
+    return PackedExercise(text=text, answer=answer, solution=solution)
+
+
+@exercise_decorator
 def volume_of_water_leaked_pipeline():
     xi=5e-10
     xi_greek = greek_letters["Small"]["Xi"]
