@@ -22,7 +22,7 @@ Where:
 p - pressure [Pa]
 {} - water density [kg/m3]
 h - depth [m]
-g - earth's acceleration [m/s^2]""".format(rho)
+g - earth's acceleration [m/s^2]""".format(rho_greek)
     return PackedExercise(text=text, answer=answer, solution=solution)
 
 
@@ -49,7 +49,7 @@ m = {0}*V/g""".format(gamma_greek, rho_greek)
 
 @exercise_decorator
 def specific_weight_given_mass():
-    gamma_greek = greek_letters["Capital"]["Gamma"]
+    gamma_greek = greek_letters["Small"]["Gamma"]
     rho_greek = greek_letters["Small"]["Rho"]
     m = random.randint(1, 100) * 5
     V = random.randint(1, 3) / 10000
@@ -70,7 +70,7 @@ So:
 
 @exercise_decorator
 def gravity_given_specific_weight_and_density():
-    gamma_greek = greek_letters["Capital"]["Gamma"]
+    gamma_greek = greek_letters["Small"]["Gamma"]
     rho_greek = greek_letters["Small"]["Rho"]
     gamma = random.randint(1, 10) * 1000
     rho = random.randint(1, 10) * 1000
@@ -78,7 +78,7 @@ def gravity_given_specific_weight_and_density():
     text = """Given fluid density {0} and specific weight {1}.
 {0} = {2} N/m^3
 {1} = {3} kg/m^3
-Calculate planet's acceleration a.""".format(rho_greek, gamma_greek, gamma, rho)
+Calculate planet's acceleration a.""".format(gamma_greek, rho_greek, gamma, rho)
     solution = """Specific weight {0} is weight per unit volume of a material.
 {0} = {1}*a
 So acceleration:
