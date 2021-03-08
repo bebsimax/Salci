@@ -3,7 +3,6 @@ import numpy as np
 import random
 
 
-
 def draw_arrow_2d(start, end, both=False):
     if end[0]<start[0]:
         temp = end
@@ -52,3 +51,23 @@ def draw_arrow_2d(start, end, both=False):
     plt.plot(x, y, 'black')
 
 
+def draw_rectangle(start, end):
+    if end[0]<start[0]:
+        temp = end
+        end = start
+        start = temp
+    start_x, start_y = start[0], start[1]
+    end_x, end_y = end[0], end[1]
+    dx = end_x - start_x
+    dy = end_y - start_y
+    plt.plot([start_x, start_x+dx], [start_y, start_y], "black")
+    plt.plot([start_x, start_x], [start_y, start_y + dy], "black")
+    plt.plot([start_x + dx, start_x + dx], [start_y, start_y + dy], "black")
+    plt.plot([start_x, start_x + dx], [start_y + dy, start_y + dy], "black")
+
+#for x in range(10):
+#    x = [random.randint(-100, 100) for x in range(2)]
+#    y = [random.randint(-100, 100) for x in range(2)]
+#    draw_rectangle(x, y)
+#plt.grid(b=True)
+#plt.show()
