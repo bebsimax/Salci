@@ -65,9 +65,28 @@ def draw_rectangle(start, end):
     plt.plot([start_x + dx, start_x + dx], [start_y, start_y + dy], "black")
     plt.plot([start_x, start_x + dx], [start_y + dy, start_y + dy], "black")
 
+
+def draw_circle(start, radius):
+    a = start[0]
+    b = start[1]
+    r = radius
+    x = []
+    y = []
+    y_m = []
+    for t in range(0, 314):
+        t = t/100
+        x.append(a + r*np.cos(t))
+        y.append(b + r*np.sin(t))
+        y_m.append(b - r*np.sin(t))
+    plt.plot(x, y, "black")
+    plt.plot(x, y_m, "black")
+
 #for x in range(10):
 #    x = [random.randint(-100, 100) for x in range(2)]
 #    y = [random.randint(-100, 100) for x in range(2)]
 #    draw_rectangle(x, y)
+#draw_circle([0, 0], 5)
 #plt.grid(b=True)
+#plt.xlim(-100, 100)
+#plt.ylim(-100, 100)
 #plt.show()
