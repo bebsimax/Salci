@@ -84,8 +84,8 @@ def draw_circle(start, radius):
 
 
 def draw_triangle(start, size, angle=-90):
-    alfa1 = np.radians(angle) + np.radians(30)
-    alfa2 = np.radians(angle) + np.radians(-30)
+    alfa1 = np.deg2rad(angle) + np.deg2rad(30)
+    alfa2 = np.deg2rad(angle) + np.deg2rad(-30)
     xs = start[0]
     ys = start[1]
     dx1 = size * np.cos(alfa1)
@@ -95,7 +95,7 @@ def draw_triangle(start, size, angle=-90):
     dx2 = size * np.cos(alfa2)
     dy2 = size * np.sin(alfa2)
     x2 = xs + dx2
-    y2 = xs + dy2
+    y2 = ys + dy2
     plt.plot([xs, x1], [ys, y1], "black")
     plt.plot([xs, x2], [ys, y2], "blue")
     plt.plot([x1, x2], [y1, y2], "orange")
