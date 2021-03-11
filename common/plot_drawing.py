@@ -82,7 +82,6 @@ def draw_circle(start, radius):
     plt.plot(x, y_m, "black")
 
 
-
 def draw_triangle(start, size, angle=-90):
     alfa1 = np.deg2rad(angle) + np.deg2rad(30)
     alfa2 = np.deg2rad(angle) + np.deg2rad(-30)
@@ -97,10 +96,23 @@ def draw_triangle(start, size, angle=-90):
     x2 = xs + dx2
     y2 = ys + dy2
     plt.plot([xs, x1], [ys, y1], "black")
-    plt.plot([xs, x2], [ys, y2], "blue")
-    plt.plot([x1, x2], [y1, y2], "orange")
+    plt.plot([xs, x2], [ys, y2], "black")
+    plt.plot([x1, x2], [y1, y2], "black")
 
 
+def draw_support(start, size, angle=-90, moveable=False):
+    circle_radius = size*0.11
+    triangle_size = size - circle_radius
+    draw_circle(start, circle_radius)
+    dx = circle_radius * np.cos(np.radians(angle))
+    dy = circle_radius * np.sin(np.radians(angle))
+    x = start[0] + dx
+    y = start[1] + dy
+    draw_triangle([x, y], triangle_size, angle)
+    if moveable is True:
+        gap = circle_radius
+    else:
+        gap = 0
 
 
 
@@ -109,8 +121,8 @@ for x in range(10):
     x = [random.randint(-50, 50) for x in range(2)]
     y = random.randint(-360, 360)
     z = random.randint(5, 10)
-    draw_triangle(start=x, size=z, angle=y)
-#draw_triangle([-10, -15], 20, -200)
+    draw_support(start=x, size=z, angle=y)
+draw_support([-10, -15], 20, -220)
 plt.grid(b=True)
 plt.xlim(-100, 100)
 plt.ylim(-100, 100)
