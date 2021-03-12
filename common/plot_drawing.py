@@ -113,17 +113,3 @@ def draw_support(start, size, angle=-90, moveable=False):
         gap = circle_radius
     else:
         gap = 0
-
-
-
-
-for x in range(10):
-    x = [random.randint(-50, 50) for x in range(2)]
-    y = random.randint(-360, 360)
-    z = random.randint(5, 10)
-    draw_support(start=x, size=z, angle=y)
-draw_support([-10, -15], 20, -220)
-plt.grid(b=True)
-plt.xlim(-100, 100)
-plt.ylim(-100, 100)
-plt.show()
