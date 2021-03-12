@@ -290,7 +290,7 @@ The hits are:
                 return self.text_responses["off"]
         else:
             if "," in submit:
-                submit.replace(",", ".")
+                submit = submit.replace(",", ".")
             try:
                 submit = float(submit)
             except ValueError:
