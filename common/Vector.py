@@ -18,7 +18,11 @@ class Vector():
     def __rmul__(self, other):
         return Vector([self.x_start * other, self.y_start * other], [self.x_end * other, self.y_end * other])
 
-
+    def __add__(self, other):
+        if isinstance(other, Vector):
+            return Vector([self.x_start+other.x_start, self.y_start+other.y_start], [self.x_end+other.x_end, self.y_end+other.y_end])
+        else:
+            pass
 v = Vector([0,0], [1,1])
 
 a = v*3
