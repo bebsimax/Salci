@@ -113,3 +113,7 @@ def draw_support(start, size, angle=-90, moveable=False):
         gap = circle_radius
     else:
         gap = 0
+
+
+def draw_arc():
+    pass
